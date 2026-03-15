@@ -25,14 +25,14 @@ jobs:
 
       - name: Build Web App
         run: |
-          # This line lists your files so we can see them in the logs if it fails
-          ls -R
-          flet publish main.py --output dist
+          # We use the modern 'build web' command instead of 'publish'
+          flet build web --output build_web
 
       - name: Upload to Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/
+          # Flet build web puts the files in our specified output folder
+          path: build_web/
 
   deploy:
     needs: build
