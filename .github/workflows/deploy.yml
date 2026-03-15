@@ -1,16 +1,21 @@
-name: Deploy Flet App
+name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  build:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -18,31 +23,22 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Flet
+      - name: Install dependencies
         run: |
-          pip install --upgrade pip
-          pip install "flet[all]"
+          python -m pip install --upgrade pip
+          pip install flet
 
       - name: Build Web App
-        run: |
-          # We create the folder manually to prevent Exit Code 1
-          mkdir -p dist
-          # We use the most stable 2026 publishing command
-          flet publish main.py --output dist
+        run: flet build web
 
-      - name: Upload to Pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/
+          path: 'build/web'
 
-  deploy:
-    needs: build
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-    runs-on: ubuntu-latest
-    steps:
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
