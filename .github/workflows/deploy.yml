@@ -18,21 +18,21 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Flet
+      - name: Install Dependencies
         run: |
           pip install --upgrade pip
           pip install flet
 
       - name: Build Web App
         run: |
-          # We use the modern 'build web' command instead of 'publish'
-          flet build web --output build_web
+          # The 'verbose' flag will show us the actual error if this fails
+          flet build web --verbose
 
       - name: Upload to Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          # Flet build web puts the files in our specified output folder
-          path: build_web/
+          # In 2026, 'flet build web' defaults to a 'build/web' folder
+          path: build/web/
 
   deploy:
     needs: build
