@@ -18,21 +18,22 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Dependencies
+      - name: Install Flet
         run: |
           pip install --upgrade pip
-          pip install flet
+          pip install "flet[all]"
 
       - name: Build Web App
         run: |
-          # The 'verbose' flag will show us the actual error if this fails
-          flet build web --verbose
+          # We create the folder manually to prevent Exit Code 1
+          mkdir -p dist
+          # We use the most stable 2026 publishing command
+          flet publish main.py --output dist
 
       - name: Upload to Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          # In 2026, 'flet build web' defaults to a 'build/web' folder
-          path: build/web/
+          path: dist/
 
   deploy:
     needs: build
